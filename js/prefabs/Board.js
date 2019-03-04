@@ -46,6 +46,12 @@ Match3.Board.prototype.populateGrid = function(){
       this.grid[i][j] = variation;
     }
   }
+
+  //if there are any chains, re-populate
+  var chains = this.findAllChains();
+  if(chains.length > 0) {
+    this.populateGrid();
+  }
 };
 
 Match3.Board.prototype.populateReserveGrid = function(){
