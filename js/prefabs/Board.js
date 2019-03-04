@@ -22,7 +22,7 @@ Match3.Board = function(state, rows, cols, blockVariations) {
   //reserve grid on the top, for when new blocks are needed
   this.reserveGrid = [];
 
-  this.RESERVE_ROW = 5;
+  this.RESERVE_ROW = rows;
 
   for(i = 0; i < this.RESERVE_ROW; i++) {
     this.reserveGrid.push([]);
@@ -181,4 +181,59 @@ Match3.Board.prototype.clearChains = function(){
   chainedBlocks.forEach(function(block){
     this.grid[block.row][block.col] = 0;
   }, this);
+};
+
+/*
+drop a block in the main grid from a position to another. the source is set to zero
+*/
+Match3.Board.prototype.dropBlock = function(sourceRow, targetRow, col){
+  this.grid[targetRow][col] = this.grid[sourceRow][col];
+  this.grid[sourceRow][col] = 0;
+};
+
+/*
+drop a block in the reserve grid from a position to another. the source is set to zero
+*/
+Match3.Board.prototype.dropReserveBlock = function(sourceRow, targetRow, col){
+  this.grid[targetRow][col] = this.reserveGrid[sourceRow][col];
+  this.reserveGrid[sourceRow][col] = 0;
+};
+
+/*
+move down blocks to fill in empty slots
+*/
+Match3.Board.prototype.updateGrid = function(){
+  var i, j, k, foundBlock;
+
+  //go through all the rows, from the bottom up
+  for(i = this.rows - 1; i >= 0; i--){
+    for(j = 0; j < this.cols; j++) {
+      //if the block if zero, then get climb up to get a non-zero one
+      if(this.grid[i][j] === 0) {
+        foundBlock = false;
+
+        //climb up in the main grid
+        for(k = i - 1; k >= 0; k--) {
+          if(this.grid[k][j] > 0) {
+            this.dropBlock(k, i, j);
+            foundBlock = true;
+            break;
+          }
+        }
+
+        if(!foundBlock) {
+          //climb up in the reserve grid
+          for(k = this.RESERVE_ROW - 1; k >= 0; k--) {
+            if(this.reserveGrid[k][j] > 0) {
+              this.dropReserveBlock(k, i, j);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  //repopulate the reserve
+  this.populateReserveGrid();
 };
