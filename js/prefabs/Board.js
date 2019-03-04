@@ -153,3 +153,32 @@ Match3.Board.prototype.isChained = function(block) {
   return isChained;
 
 };
+/*
+find all the chains
+*/
+Match3.Board.prototype.findAllChains = function() {
+  var chained = [];
+  var i, j;
+
+  for(i = 0; i < this.rows; i++) {
+    for(j = 0; j < this.cols; j++) {
+      if(this.isChained({row: i, col: j})) {
+        chained.push({row: i, col: j});
+      }
+    }
+  }
+
+  return chained;
+};
+
+/*
+clear all the chains*/
+Match3.Board.prototype.clearChains = function(){
+  //gets all blocks that need to be cleared
+  var chainedBlocks = this.findAllChains();
+
+  //set them to zero
+  chainedBlocks.forEach(function(block){
+    this.grid[block.row][block.col] = 0;
+  }, this);
+};
