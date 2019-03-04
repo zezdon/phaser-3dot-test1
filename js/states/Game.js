@@ -19,12 +19,6 @@ Match3.GameState = {
     this.board.consoleLog();
 
     this.drawBoard();
-
-    var block1 = this.blocks.children[10];
-    var block2 = this.blocks.children[11];
-
-    this.swapBlocks(block1, block2);
-
   },
   createBlock: function(x, y, data) {
     var block = this.blocks.getFirstExists(false);
@@ -96,6 +90,10 @@ Match3.GameState = {
     blockMovement.start();
   },
   swapBlocks: function(block1, block2) {
+
+    //when swapping scale block1 back to 1
+    block1.scale.setTo(1);
+
     var block1Movement = this.game.add.tween(block1);
     block1Movement.to({x: block2.x, y: block2.y}, this.ANIMATION_TIME);
     block1Movement.onComplete.add(function(){
@@ -116,6 +114,7 @@ Match3.GameState = {
       }
       else {
         this.isReversingSwap = false;
+        this.clearSelection();
       }
 
     }, this);
@@ -124,6 +123,43 @@ Match3.GameState = {
     var block2Movement = this.game.add.tween(block2);
     block2Movement.to({x: block1.x, y: block1.y}, this.ANIMATION_TIME);
     block2Movement.start();
+  },
+  pickBlock: function(block) {
+    //only swap if the UI is not blocked
+    if(this.isBoardBlocked) {
+      return;
+    }
+
+    //if there is nothing selected
+    if(!this.selectedBlock) {
+      //highlight the first block
+      block.scale.setTo(1.5);
+
+      this.selectedBlock = block;
+    }
+    else {
+      //second block you are selecting is target block
+      this.targetBlock = block;
+
+      //only adjacent blocks can swap
+      if(this.board.checkAdjacent(this.selectedBlock, this.targetBlock)) {
+        //block the UI
+        this.isBoardBlocked = true;
+
+        //swap blocks
+        this.swapBlocks(this.selectedBlock, this.targetBlock);
+      }
+      else {
+        this.clearSelection();
+      }
+    }
+
+  },
+  clearSelection: function() {
+    this.isBoardBlocked = false;
+    this.selectedBlock = null;
+    this.blocks.setAll('scale.x', 1);
+    this.blocks.setAll('scale.y', 1);
   }
 
 
