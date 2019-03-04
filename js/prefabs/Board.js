@@ -193,6 +193,8 @@ drop a block in the main grid from a position to another. the source is set to z
 Match3.Board.prototype.dropBlock = function(sourceRow, targetRow, col){
   this.grid[targetRow][col] = this.grid[sourceRow][col];
   this.grid[sourceRow][col] = 0;
+
+  this.state.dropBlock(sourceRow, targetRow, col);
 };
 
 /*
@@ -201,6 +203,8 @@ drop a block in the reserve grid from a position to another. the source is set t
 Match3.Board.prototype.dropReserveBlock = function(sourceRow, targetRow, col){
   this.grid[targetRow][col] = this.reserveGrid[sourceRow][col];
   this.reserveGrid[sourceRow][col] = 0;
+
+  this.state.dropReserveBlock(sourceRow, targetRow, col);
 };
 
 /*
