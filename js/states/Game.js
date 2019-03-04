@@ -7,7 +7,7 @@ Match3.GameState = {
     this.NUM_COLS = 8;
     this.NUM_VARIATIONS = 6;
     this.BLOCK_SIZE = 35;
-    this.ANIMATION_TIME = 200;
+    this.ANIMATION_TIME = 300;
   },
   create: function() {
     //game background
@@ -104,8 +104,7 @@ Match3.GameState = {
         var chains = this.board.findAllChains();
 
         if(chains.length > 0) {
-          this.board.clearChains();
-          this.board.updateGrid();
+          this.updateBoard();
         }
         else {
           this.isReversingSwap = true;
@@ -160,6 +159,23 @@ Match3.GameState = {
     this.selectedBlock = null;
     this.blocks.setAll('scale.x', 1);
     this.blocks.setAll('scale.y', 1);
+  },
+  updateBoard: function() {
+    this.board.clearChains();
+    this.board.updateGrid();
+
+    //after the dropping has ended
+    this.game.time.events.add(this.ANIMATION_TIME, function(){
+      //see if there are new chains
+      var chains = this.board.findAllChains();
+
+      if(chains.length > 0) {
+        this.updateBoard();
+      }
+      else {
+        this.clearSelection();
+      }
+    }, this);
   }
 
 
